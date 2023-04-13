@@ -5,8 +5,11 @@ from Data_preprocessing import get_tensor
 from trax import layers as tl
 from trax.supervised import training
 
-def batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
-    """
+
+"""
+    This function generates data in batches for our classification model for batch processing.
+
+    Arguments:
         batch_size: no of tensors to be returned
         data: set of examples
         data_emotions: set of targets
@@ -14,7 +17,8 @@ def batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict,
         emo_vocab_dict: enumerated emotions as dictionary
         loop: boolean to indicate loop
         shuffle: boolean indicate to shuffle or not
-    """
+"""
+def batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
     
     len_data = len(data)
     # Initialize data index
@@ -67,15 +71,64 @@ def batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict,
         
         yield inputs, targets, example_weights
 
+
+
+"""
+    This function generates batches of examples for training the classification model.
+    Arguments:
+        batch_size: no of tensors to be returned
+        data: set of examples
+        data_emotions: set of targets
+        vocab_dict: vocabulary dictionary
+        emo_vocab_dict: enumerated emotions as dictionary
+        loop: boolean to indicate loop
+        shuffle: boolean indicate to shuffle or not
+"""
 def train_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
     return batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop, shuffle)
 
+
+"""
+    This function generates batches of examples for validating the classification model.
+    Arguments:
+        batch_size: no of tensors to be returned
+        data: set of examples
+        data_emotions: set of targets
+        vocab_dict: vocabulary dictionary
+        emo_vocab_dict: enumerated emotions as dictionary
+        loop: boolean to indicate loop
+        shuffle: boolean indicate to shuffle or not
+"""
 def val_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
     return batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop, shuffle)
 
+
+"""
+    This function generates batches of examples for testing the classification model.
+    Arguments:
+        batch_size: no of tensors to be returned
+        data: set of examples
+        data_emotions: set of targets
+        vocab_dict: vocabulary dictionary
+        emo_vocab_dict: enumerated emotions as dictionary
+        loop: boolean to indicate loop
+        shuffle: boolean indicate to shuffle or not
+"""
 def test_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
     return batch_generator(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop, shuffle)
 
+
+"""
+    This function returns training and evaluation tasks required to train the classification model.
+    Arguments:
+        batch_size: no of tensors to be returned
+        data: set of examples
+        data_emotions: set of targets
+        vocab_dict: vocabulary dictionary
+        emo_vocab_dict: enumerated emotions as dictionary
+        loop: boolean to indicate loop
+        shuffle: boolean indicate to shuffle or not
+"""
 def get_train_eval_tasks(batch_size, data, data_emotions, vocab_dict, emo_vocab_dict, loop=True, shuffle=True):
     train_task = training.TrainTask(
         labeled_data = train_generator(batch_size, data,

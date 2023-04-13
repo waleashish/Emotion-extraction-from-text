@@ -1,7 +1,3 @@
-"""
-    This class contains all the functions required for data preprocessing.
-"""
-
 import re
 import string
 
@@ -15,7 +11,9 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 """
-    This function processes the 'emotion tweet dataset' and splits it into training and validation datasets.
+    This function processes the emotion tweet dataset and splits it into training and validation datasets.
+    Arguments:
+        filePath : path of data file
 """
 def load_dataset(filePath):
     df = pd.read_csv(filePath)
@@ -35,6 +33,12 @@ def load_dataset(filePath):
 
     return df, all_tweets, all_emotions, train_x, train_y, val_x, val_y
 
+"""
+    This function extracts words from a sentence by processing it using tokenization, removal of stopwords, etc. Returns the words in
+    the form of list.
+    Arguments:
+        text : sentence to be processed
+"""
 def process_sentence(text):
     stemmer = PorterStemmer()
     stopwords_english = stopwords.words('english')
@@ -60,6 +64,11 @@ def process_sentence(text):
     return text_clean
 
 
+"""
+    This function assigns unique integer to all the distinct words present in our dataset that we use to train the model.
+    Arguments:
+        train_x : training examples
+"""
 def build_vocab(train_x):
     """ The vocabulary includes some special tokens as follows:
     '__PAD__'  : padding
@@ -77,6 +86,11 @@ def build_vocab(train_x):
                 
     return vocab
 
+"""
+    This function assigns unique integer to all the distinct emotion classes that we use to train the model.
+    Arguments:
+        emotions : set of emotions
+"""
 def build_emotion_vocab(emotions):
     emo_vocab = {}
     for e in emotions:
@@ -85,6 +99,13 @@ def build_emotion_vocab(emotions):
             
     return emo_vocab
 
+"""
+    This function converts a sentence to tensor representing integer values for words in the sentence.
+    Arguments:
+        sentence : sentence to be converted to tensor
+        vocab_dict : dictionary containing integer for unique words
+        unknown_token : unknown token used for words not present in the vocab dictionary
+"""
 def get_tensor(sentence, vocab_dict, unknown_token = '__UNK__'):
     tensor = []
     for word in process_sentence(sentence):

@@ -11,15 +11,52 @@
 """
 
 import os
-import trax
-import random as rnd
-from trax import fastmath
-from trax import layers as tl
-
+import trax.fastmath.numpy as np
+from trax.supervised import training
 
 import Data_preprocessing
 import Data_generator
+from Model import classifier
 
+"""
+    This function trains the classification model and returns the training loop.
+    Arguments:
+        model : the classifier
+        train_tasks : training tasks needed for trax training
+        eval_tasks : evaluation tasks needed for trax training
+        n_steps : number of times the training loop is to be executed
+        output_dir : the output directory
+"""
+def train_model(model, train_tasks, eval_tasks, n_steps, output_dir):
+    training_loop = training.Loop(model,
+                                 train_tasks,
+                                 eval_tasks = [eval_tasks],
+                                 output_dir = output_dir,
+                                 random_seed = 31)
+    
+    training_loop.run(n_steps)
+    return training_loop
+
+"""
+    This function predicts the emotion of a sentence.
+    Arguments:
+        sentence : the sentence for which emotion needs to be predicted
+        eval_model : classification model
+        vocab_dict : vocabulary dictionary
+        emo_vocab_dict : enumerated emotions as dictionary
+"""
+def predict_emotion(sentence, eval_model, vocab_dict, emo_vocab_dict):
+  input = np.array(Data_preprocessing.get_tensor(sentence, vocab_dict))
+  input = input[None, :]
+  pred_probs = eval_model(input)
+  index_find = np.argmax(pred_probs)
+  prediction = "No Prediction right now"
+
+  for emotion, index in emo_vocab_dict.items():
+    if index == index_find:
+      prediction = emotion
+          
+  return prediction
 
 
 def main():
@@ -34,9 +71,14 @@ def main():
                                      emotion_enum,
                                      loop=True,
                                      shuffle=True)
-
-    
+    model = classifier(vocab_size=len(vocab), output_dim=len(emotion_enum))
+    training_loop = train_model(model, train_task, eval_task, 2500, output_dir_expand)
+    eval_model = training_loop.eval_model
+    return vocab, emotion_enum, eval_model
 
 
 if __name__=='__main__':
-    main()
+    vocab, emotion_enum, eval_model = main()
+    while True:
+       sentence = input("Enter sentence: ")
+       print(predict_emotion(sentence, eval_model, vocab, emotion_enum))
